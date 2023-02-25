@@ -11,16 +11,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain1(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated();
-        http.formLogin();
-//        http.apply(new CustomSecurityConfigurer().setFlag(false));
+//        http.formLogin();
+//        http.httpBasic();
+        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> System.out.println("custom entryPoint"));
         return http.build();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain2(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().authenticated();
-        http.httpBasic();
-//        http.apply(new CustomSecurityConfigurer().setFlag(false));
-        return http.build();
-    }
 }
