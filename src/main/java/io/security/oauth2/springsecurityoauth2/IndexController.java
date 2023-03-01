@@ -1,6 +1,9 @@
 package io.security.oauth2.springsecurityoauth2;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -10,6 +13,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,5 +71,23 @@ public class IndexController {
         OAuth2User oAuth2User = oidcUserService.loadUser(oAuth2UserRequest);
 
         return oAuth2User;
+    }
+
+    @GetMapping("/authentication")
+    public OAuth2User auth(Authentication authentication) {
+//        OAuth2AuthenticationToken authenticationToken =  (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
+        OAuth2User oAuth2User = authenticationToken.getPrincipal();
+        return oAuth2User;
+    }
+
+    @GetMapping("/annoAuthentication")
+    public OAuth2User auth(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        return oAuth2User;
+    }
+
+    @GetMapping("/oidcAnnoAuthentication")
+    public OidcUser auth(@AuthenticationPrincipal OidcUser oidcUser) {
+        return oidcUser;
     }
 }
