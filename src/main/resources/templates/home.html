@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>Welcome</div>
+<div sec:authorize="isAuthenticated()"><a th:href="@{/logout}">Logout</a></div>
+<form sec:authorize="isAnonymous()" action="#">
+    <p><input type="button" value="AuthorizationCode Grant" onclick="authorizationcode()"></p>
+    <p><input type="button" value="AuthorizationCode Grant with PKCE" onclick="authorizationcodeWithPKCE()"></p>
+    <p><input type="button" value="Implicit Grant" onclick="implicit()"></p>
+</form>
+</body>
+<script>
+    const authorizationcode = () => window.location = new URL("http://localhost:8081/oauth2/authorization/keycloak1");
+    const authorizationcodeWithPKCE = () => window.location = new URL("http://localhost:8081/oauth2/authorization/keycloakWithPKCE");
+    const implicit = () => window.location = new URL("http://localhost:8081/oauth2/authorization/keycloak2");
+</script>
+</html>

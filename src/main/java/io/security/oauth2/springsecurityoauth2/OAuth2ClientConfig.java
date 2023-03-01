@@ -4,10 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -17,29 +16,17 @@ public class OAuth2ClientConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests(authRequest -> authRequest
-                .anyRequest().permitAll());
-
-        http.oauth2Login(oauth2 -> oauth2.loginPage("/login")
-                .authorizationEndpoint(authorizationEndpointConfig ->
-                        authorizationEndpointConfig.baseUri("/oauth2/v1/authorization"))
-                .redirectionEndpoint(redirectionEndpointConfig ->
-                        redirectionEndpointConfig.baseUri("/login/v1/oauth2/code/*")));
-//        http
-//                .logout()
-//                .logoutSuccessHandler(oidcLogoutSuccessHandler())
-//                .invalidateHttpSession(true)
-//                .clearAuthentication(true)
-//                .deleteCookies("JSESSIONID");
-
+        http.authorizeRequests(authRequest -> authRequest.antMatchers("/home").permitAll()
+                .anyRequest().authenticated());
+        http.oauth2Login(authLogin -> authLogin.authorizationEndpoint(
+                authEndpoint -> authEndpoint.authorizationRequestResolver(customOAuth2AuthorizationRequestResolver())
+        ));
+        http.logout().logoutSuccessUrl("/home");
         return http.build();
     }
 
-    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
-        OidcClientInitiatedLogoutSuccessHandler successHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        successHandler.setPostLogoutRedirectUri("http://localhost:8081/login");
-
-        return successHandler;
+    private OAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver() {
+        return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
     }
 
 }
