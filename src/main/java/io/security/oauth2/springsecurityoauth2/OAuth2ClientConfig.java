@@ -2,7 +2,6 @@ package io.security.oauth2.springsecurityoauth2;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
@@ -20,15 +19,18 @@ public class OAuth2ClientConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests(authRequest -> authRequest
                 .anyRequest().permitAll());
-//        http.oauth2Login(oauth2 -> oauth2.loginPage("/loginPage"));
-        http.oauth2Login(Customizer.withDefaults());
 
-        http
-                .logout()
-                .logoutSuccessHandler(oidcLogoutSuccessHandler())
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .deleteCookies("JSESSIONID");
+        http.oauth2Login(oauth2 -> oauth2.loginPage("/login")
+                .authorizationEndpoint(authorizationEndpointConfig ->
+                        authorizationEndpointConfig.baseUri("/oauth2/v1/authorization"))
+                .redirectionEndpoint(redirectionEndpointConfig ->
+                        redirectionEndpointConfig.baseUri("/login/v1/oauth2/code/*")));
+//        http
+//                .logout()
+//                .logoutSuccessHandler(oidcLogoutSuccessHandler())
+//                .invalidateHttpSession(true)
+//                .clearAuthentication(true)
+//                .deleteCookies("JSESSIONID");
 
         return http.build();
     }
