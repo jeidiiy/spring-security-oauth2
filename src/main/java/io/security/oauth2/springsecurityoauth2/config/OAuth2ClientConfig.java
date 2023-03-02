@@ -1,4 +1,4 @@
-package io.security.oauth2.springsecurityoauth2;
+package io.security.oauth2.springsecurityoauth2.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,13 +17,12 @@ public class OAuth2ClientConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests(authRequest -> authRequest.antMatchers("/home", "/client").permitAll()
+        http.authorizeRequests(authRequest -> authRequest.antMatchers("/", "/oauth2Login", "/client").permitAll()
                 .anyRequest().authenticated());
 //        http.oauth2Login(authLogin -> authLogin.authorizationEndpoint(
 //                authEndpoint -> authEndpoint.authorizationRequestResolver(customOAuth2AuthorizationRequestResolver())
 //        ));
         http.oauth2Client(Customizer.withDefaults());
-        http.logout().logoutSuccessUrl("/home");
         return http.build();
     }
 

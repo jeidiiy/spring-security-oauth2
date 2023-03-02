@@ -1,4 +1,4 @@
-package io.security.oauth2.springsecurityoauth2;
+package io.security.oauth2.springsecurityoauth2.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -23,8 +23,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class ClientController {
 
-    private OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
-    private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+    private final OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
+    private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
     @GetMapping("/client")
     public String client(HttpServletRequest request, Model model) {
