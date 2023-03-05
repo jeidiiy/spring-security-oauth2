@@ -12,7 +12,9 @@
 <div sec:authorize="isAuthenticated()"><a th:href="@{/logout}">Logout</a></div>
 <form sec:authorize="isAnonymous()" action="#">
     <p><input type="button" value="AuthorizationCode Grant" onclick="authorizationCode()"></p>
+    <p sec:authorize="isAnonymous()"><a th:href="@{/v2/oauth2Login}">AuthorizationCode Grant</a></p>
     <p sec:authorize="isAnonymous()"><a th:href="@{/oauth2Login(username='user', password='1234')}">Password Flow Login</a></p>
+    <p sec:authorize="isAnonymous()"><a th:href="@{/v2/oauth2Login(username='user', password='1234')}">Password Flow Login</a></p>
     <p sec:authorize="isAnonymous()"><a th:href="@{/oauth2Login}">Client Credentials Flow Login</a></p>
 </form>
 </body>

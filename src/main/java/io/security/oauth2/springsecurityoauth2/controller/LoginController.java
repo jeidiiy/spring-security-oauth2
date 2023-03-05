@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -38,6 +39,30 @@ public class LoginController {
 
     private final Duration clockSkew = Duration.ofSeconds(3600);
     private final Clock clock = Clock.systemUTC();
+
+    @GetMapping("/v2/oauth2Login")
+    public String oauth2LoginV2(@RegisteredOAuth2AuthorizedClient("keycloak") OAuth2AuthorizedClient authorizedClient,
+                                Model model) {
+        if (authorizedClient != null) {
+            DefaultOAuth2UserService defaultOAuth2UserService = new DefaultOAuth2UserService();
+            ClientRegistration clientRegistration = authorizedClient.getClientRegistration();
+            OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+            OAuth2UserRequest oAuth2UserRequest = new OAuth2UserRequest(clientRegistration, accessToken);
+            OAuth2User oAuth2User = defaultOAuth2UserService.loadUser(oAuth2UserRequest);
+
+            SimpleAuthorityMapper authorityMapper = new SimpleAuthorityMapper();
+            authorityMapper.setPrefix("SYSTEM_");
+            Set<GrantedAuthority> grantedAuthorities = authorityMapper.mapAuthorities(oAuth2User.getAuthorities());
+            OAuth2AuthenticationToken oAuth2AuthenticationToken = new OAuth2AuthenticationToken(oAuth2User, grantedAuthorities, clientRegistration.getRegistrationId());
+
+            SecurityContextHolder.getContext().setAuthentication(oAuth2AuthenticationToken);
+        }
+
+        model.addAttribute("AccessToken", authorizedClient.getAccessToken().getTokenValue());
+        model.addAttribute("RefreshToken", authorizedClient.getRefreshToken().getTokenValue());
+
+        return "home";
+    }
 
     @GetMapping("/oauth2Login")
     public String oauth2Login(Model model, HttpServletRequest request, HttpServletResponse response) {
