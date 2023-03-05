@@ -1,0 +1,3 @@
+[submodule "social-login"]
+	path = social-login
+	url = https://github.com/jeidiiy/social-login.git
